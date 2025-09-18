@@ -1,0 +1,39 @@
+# Python Bytecode & Caches
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / Packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*.nbconvert.ipynb
+
+# IDE / Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+
+# OS-specific
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
