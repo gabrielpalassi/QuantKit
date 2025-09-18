@@ -1,0 +1,8 @@
+mplcursors==0.7
+numpy==2.2.6
+pandas==2.3.2
+pandas_ta==0.4.71b0
+matplotlib==3.10.6
+yfinance==0.2.66
+scipy==1.16.2
+python-bcb==0.3.3
