@@ -94,11 +94,10 @@ first_month_cdi_returns = (cdi_month_closing.iloc[0] - cdi_month_opening.iloc[0]
 #
 
 # Download historical data for the Bovespa index (^BVSP)
-ibov_data = yf.download("^BVSP", start=start_date)
-ibov = ibov_data["Adj Close"]
+ibov = yf.download("^BVSP", start=start_date, auto_adjust=True)["Close"]
 
 # Calculate moving averages
-ibov_ma = ta.sma(ibov_data["Close"], ma_months * 21)  # Average of 21 working days / month
+ibov_ma = ta.sma(ibov, ma_months * 21)  # Average of 21 working days / month
 
 # Convert the index to datetime and sort the data by date in ascending order for all DataFrames
 ibov.index = pd.to_datetime(ibov.index)

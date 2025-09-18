@@ -46,7 +46,7 @@ def validate_assets(asset_inputs, start_date):
         # Remove leading/trailing spaces
         ticker = ticker.strip()
         # Download asset data using yfinance
-        asset_data = yf.download(ticker, start_date)["Adj Close"]
+        asset_data = yf.download(ticker, start_date, auto_adjust=True)["Close"]
         if len(asset_data) > 0:
             # Store asset data if successfully downloaded
             assets[ticker] = asset_data
@@ -141,7 +141,7 @@ plt.xlabel("Time")
 plt.ylabel("Drawdown")
 axes.set_title("Drawdown x Time")
 
-legend_text = "\n".join([f"{ticker}: {max_drawdown:.2%}" for ticker, max_drawdown in max_drawdowns.items()]) + "\n"
+legend_text = "\n".join([f"{ticker}: {float(max_drawdown.iloc[0]):.2%}" for ticker, max_drawdown in max_drawdowns.items()]) + "\n"
 plt.legend(title=f"Max. Drawdowns:\n\n{legend_text}")
 
 # Enable cursor interaction on the graph

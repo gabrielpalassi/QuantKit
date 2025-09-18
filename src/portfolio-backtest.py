@@ -50,7 +50,7 @@ def validate_assets(asset_inputs, start_date):
         # Remove leading/trailing spaces
         ticker = ticker.strip()
         # Download asset data using yfinance
-        asset_data = yf.download(ticker, start_date)["Adj Close"]
+        asset_data = yf.download(ticker, start_date, auto_adjust=True)["Close"]
         if len(asset_data) > 0:
             # Store asset data if successfully downloaded
             assets[ticker] = asset_data

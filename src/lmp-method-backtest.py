@@ -74,8 +74,7 @@ first_month_cdi_returns = (cdi_month_closing.iloc[0] - cdi_month_opening.iloc[0]
 #
 
 # Download historical data for the Bovespa index (^BVSP)
-ibov_data = yf.download("^BVSP", start=start_date)
-ibov = ibov_data["Adj Close"]
+ibov = yf.download("^BVSP", start=start_date, auto_adjust=True)["Close"]
 
 # Convert the index to datetime and sort the data by date in ascending order for all DataFrames
 ibov.index = pd.to_datetime(ibov.index)
