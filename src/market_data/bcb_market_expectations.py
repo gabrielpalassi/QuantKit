@@ -154,17 +154,20 @@ graphs, axes = plt.subplots(2, 2, figsize=(14, 8))
 axes[0][0].plot(selic, label="Selic")
 axes[0][0].yaxis.set_major_formatter(ticker.PercentFormatter())
 axes[0][0].set_ylabel("Selic")
+axes[0][0].xaxis.set_major_locator(ticker.MaxNLocator(nbins=6))
 axes[0][0].legend()
 
 axes[0][1].plot(dollar, label="USD")
 axes[0][1].yaxis.set_major_formatter(brl_formatter)
 axes[0][1].set_ylabel("Dollar (USD)")
+axes[0][1].xaxis.set_major_locator(ticker.MaxNLocator(nbins=6))
 axes[0][1].legend()
 
 axes[1][0].plot(monthly_ipca, label="IPCA")
 axes[1][0].plot(monthly_igpm, label="IGP-M")
 axes[1][0].yaxis.set_major_formatter(ticker.PercentFormatter(decimals=2))
 axes[1][0].set_ylabel("Monthly Inflation")
+axes[1][0].xaxis.set_major_locator(ticker.MaxNLocator(nbins=6))
 axes[1][0].legend()
 
 # Convert the index of anual_ipca and anual_igpm to a list for plotting in bars
@@ -185,4 +188,5 @@ axes[1][1].legend()
 # Enable cursor interaction with the graphs
 setup_mplcursors()
 
+plt.tight_layout()
 plt.show()
