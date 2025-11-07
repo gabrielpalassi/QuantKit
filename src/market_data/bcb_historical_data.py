@@ -1,57 +1,48 @@
-from datetime import datetime, date
 from bcb import sgs
 from dateutil.relativedelta import relativedelta
 from bcb import currency
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import mplcursors
+import sys
+import os
+from datetime import datetime, date
+
+# Add the src directory to the path to import utils
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from utils import get_start_date_input, setup_mplcursors, brl_formatter, apply_mpl_style, print_with_separator
 
 #
 # Overview
 #
 
-print("\n#----------------------------- Program Overview -----------------------------#\n")
-print("This program retrieves and graphs hirstorical financial data from the Brazilian Central Bank (BCB).")
-print("- Selic (Sistema Especial de Liquidação e Custódia): Selic is the Brazilian Central Bank's benchmark interest rate.")
-print("- Currencies: The program also tracks the exchange rates of USD and EUR against the Brazilian Real (BRL).")
-print("- IPCA (Índice Nacional de Preços ao Consumidor Amplo): IPCA represents the official inflation index in Brazil.")
-print("- IGP-M (Índice Geral de Preços do Mercado): IGP-M is another important inflation index in Brazil.")
-print("\n#----------------------------------------------------------------------------#\n")
+print_with_separator(
+    [
+        "Brazilian Central Bank (BCB) - Historical Data Visualization",
+        "",
+        "This program retrieves and visualizes key economic indicators from the BCB.",
+        "",
+        "Interest Rates",
+        "- Selic: Brazil's benchmark interest rate",
+        "Exchange Rates",
+        "- USD/BRL: US Dollar to Brazilian Real exchange rate",
+        "- EUR/BRL: Euro to Brazilian Real exchange rate",
+        "Inflation Indices",
+        "- IPCA: Official consumer price inflation index",
+        "- IGP-M: General market price inflation index",
+    ]
+)
 
 #
 # Inputs
 #
 
-start_date = None
-
-
-def validate_date(input_date):
-    try:
-        # Check if the input matches the desired format (YYYY-MM-DD)
-        parsed_date = datetime.strptime(input_date, "%Y-%m-%d")
-        year, month, day = map(str, input_date.split("-"))
-        if len(year) == 4 and len(month) == 2 and len(day) == 2:
-            if parsed_date.date() < date.today():
-                print("Downloading data...")
-                return True
-            else:
-                print("The start date should be before today's date.")
-                return False
-        else:
-            return False
-    except:
-        return False
-
-
-while start_date is None:
-    start_date = input("Please input the analysis start date (YYYY-MM-DD): ")
-    if not validate_date(start_date):
-        print("Invalid date. Please use YYYY-MM-DD format.")
-        start_date = None
+start_date = get_start_date_input(1825)  # Limit to the last 5 years (1825 days)
 
 #
 # Data
 #
+
+print("Downloading data...")
 
 # Get data
 selic = sgs.get({"Selic": 432}, start=start_date)
@@ -72,7 +63,7 @@ igpm_12m = igpm_12m.rolling(12).apply(lambda x: (1 + x / 100).prod() - 1).dropna
 # Graph
 #
 
-plt.style.use("./mplstyles/financialgraphs.mplstyle")
+apply_mpl_style()
 
 graphs, axes = plt.subplots(4, figsize=(14, 8), sharex="col")
 
@@ -80,11 +71,6 @@ axes[0].plot(selic, label="Selic")
 axes[0].yaxis.set_major_formatter(ticker.PercentFormatter())
 axes[0].set_ylabel("Selic")
 axes[0].legend(title=f'Current Selic: {selic["Selic"].iloc[-1]}')
-
-
-def brl_formatter(x, pos):
-    return f"R${x:.2f}"
-
 
 axes[1].plot(currencies["USD"], label="USD")
 axes[1].plot(currencies["EUR"], label="EUR")
@@ -105,15 +91,6 @@ axes[3].set_ylabel("12-month Rolling Inflation")
 axes[3].legend(title=f'Last IPCA: {ipca_12m["IPCA"].iloc[-1]:.2f}\nLast IGP-M: {igpm_12m["IGP-M"].iloc[-1]:.2f}')
 
 # Add interactive annotations with cursor functionality
-cursor = mplcursors.cursor()
-
-
-@cursor.connect("add")
-def on_add(sel):
-    sel.annotation.get_bbox_patch().set(fc="gray", alpha=0.8)
-    sel.annotation.get_bbox_patch().set_edgecolor("gray")
-    sel.annotation.arrow_patch.set_color("white")
-    sel.annotation.arrow_patch.set_arrowstyle("-")
-
+setup_mplcursors()
 
 plt.show()

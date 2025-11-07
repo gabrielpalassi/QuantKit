@@ -3,19 +3,32 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import mplcursors
+import sys
+import os
+
+# Add the src directory to the path to import utils
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from utils import setup_mplcursors, brl_formatter, apply_mpl_style, print_with_separator
 
 #
 # Overview
 #
 
-print("\n#----------------------------- Program Overview -----------------------------#\n")
-print("This program retrieves and graphs market expectations from the Brazilian Central Bank (BCB).")
-print("- Selic (Sistema Especial de Liquidação e Custódia): Selic is the Brazilian Central Bank's benchmark interest rate.")
-print("- Dollar (USD): Brazilian Real (BRL) x American Dollar (USD) exchange rate.")
-print("- IPCA (Índice Nacional de Preços ao Consumidor Amplo): IPCA represents the official inflation index in Brazil.")
-print("- IGP-M (Índice Geral de Preços do Mercado): IGP-M is another important inflation index in Brazil.")
-print("\n#----------------------------------------------------------------------------#\n")
+print_with_separator(
+    [
+        "Brazilian Central Bank (BCB) - Market Expectations",
+        "",
+        "This program retrieves and visualizes forward-looking market consensus forecasts.",
+        "",
+        "Interest Rates",
+        "- Selic: Expected future benchmark interest rate",
+        "Exchange Rates",
+        "- USD/BRL: Expected US Dollar to Brazilian Real exchange rate",
+        "Inflation Indices",
+        "- IPCA: Expected official consumer price inflation",
+        "- IGP-M: Expected general market price inflation",
+    ]
+)
 
 #
 # Data
@@ -134,7 +147,7 @@ anual_igpm = format_expectations(anual_igpm, "anual")
 # Graph
 #
 
-plt.style.use("./mplstyles/financialgraphs.mplstyle")
+apply_mpl_style()
 
 graphs, axes = plt.subplots(2, 2, figsize=(14, 8))
 
@@ -142,11 +155,6 @@ axes[0][0].plot(selic, label="Selic")
 axes[0][0].yaxis.set_major_formatter(ticker.PercentFormatter())
 axes[0][0].set_ylabel("Selic")
 axes[0][0].legend()
-
-
-def brl_formatter(x, pos):
-    return f"R${x:.2f}"
-
 
 axes[0][1].plot(dollar, label="USD")
 axes[0][1].yaxis.set_major_formatter(brl_formatter)
@@ -175,15 +183,6 @@ axes[1][1].set_ylabel("Annual Inflation")
 axes[1][1].legend()
 
 # Enable cursor interaction with the graphs
-cursor = mplcursors.cursor()
-
-
-@cursor.connect("add")
-def on_add(sel):
-    sel.annotation.get_bbox_patch().set(fc="gray", alpha=0.8)
-    sel.annotation.get_bbox_patch().set_edgecolor("gray")
-    sel.annotation.arrow_patch.set_color("white")
-    sel.annotation.arrow_patch.set_arrowstyle("-")
-
+setup_mplcursors()
 
 plt.show()

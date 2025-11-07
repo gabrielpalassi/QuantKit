@@ -2,23 +2,14 @@
 **/__pycache__/
 *.py[cod]
 *$py.class
+*.so
 
 # Virtual Environments
 .venv/
 venv/
 env/
 ENV/
-
-# Distribution / Packaging
-build/
-dist/
-*.egg-info/
-*.egg
-.eggs/
-
-# Jupyter Notebooks
-.ipynb_checkpoints
-*.nbconvert.ipynb
+.env
 
 # IDE / Editor Files
 .vscode/
@@ -26,6 +17,9 @@ dist/
 *.swp
 *.swo
 
+# uv
+.uv/
+uv.lock
 
 # OS-specific
 .DS_Store

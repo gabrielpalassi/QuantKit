@@ -1,47 +1,43 @@
-import logging
-from datetime import datetime, date
+from datetime import date
 from bcb import sgs
 import yfinance as yf
-import pandas_ta as ta
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import mplcursors
+import sys
+import os
+
+# Add the src directory to the path to import utils
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from utils import configure_yfinance_logging, get_start_date_input, apply_mpl_style, setup_mplcursors, print_with_separator
 
 #
 # Overview
 #
 
-print("\n#----------------------------- Program Overview -----------------------------#\n")
-print("The models reinvest the entirety of the hypothetical value on the first day of each month based on metrics from the previous month(s).")
-print("- CDI (Certificado de Depósito Interbancário): CDI is an important interest rate benchmark in Brazil.")
-print("- IBOV (Ibovespa): IBOV is the benchmark stock index of the São Paulo Stock Exchange (B3).")
-print("- Moving Average Method: Invests in IBOV if the previous month's closing value was higher than the moving average. In CDI if not.")
-print("\n#----------------------------------------------------------------------------#\n")
+print_with_separator(
+    [
+        "Strategy Backtest: Moving Average Method",
+        "",
+        "This program backtests a technical analysis-based tactical asset allocation strategy.",
+        "",
+        "Strategy Logic",
+        "- Monthly rebalancing on the first day of each month",
+        "- If last month's IBOV closing price > Moving Average → Invest 100% in IBOV (stocks)",
+        "- Otherwise → Invest 100% in CDI (fixed income)",
+        "Assets",
+        "- CDI: Brazil's benchmark fixed income rate",
+        "- IBOV: Ibovespa stock market index (B3 exchange)",
+        "Output",
+        "- Cumulative returns comparison: Strategy vs. Buy-and-Hold",
+    ]
+)
 
 #
 # Inputs
 #
 
-# Set the logging level for yfinance to CRITICAL to reduce noise
-logging.getLogger("yfinance").setLevel(logging.CRITICAL)
-
-
-def validate_date(input_date):
-    try:
-        # Check if the input matches the desired format (YYYY-MM-DD)
-        parsed_date = datetime.strptime(input_date, "%Y-%m-%d")
-        year, month, day = map(str, input_date.split("-"))
-        if len(year) == 4 and len(month) == 2 and len(day) == 2:
-            if parsed_date.date() < date.today():
-                return True
-            else:
-                print("The start date should be before today's date.")
-                return False
-        else:
-            return False
-    except:
-        return False
+configure_yfinance_logging()
 
 
 def validate_ma(input_ma):
@@ -53,12 +49,7 @@ def validate_ma(input_ma):
         return False
 
 
-start_date = None
-while start_date is None:
-    start_date = input("Please input the analysis start date (YYYY-MM-DD): ")
-    if not validate_date(start_date):
-        print("Invalid date. Please use YYYY-MM-DD format.")
-        start_date = None
+start_date = get_start_date_input(1825)  # Limit to the last 5 years (1825 days)
 
 ma_months = None
 while ma_months is None:
@@ -97,7 +88,7 @@ first_month_cdi_returns = (cdi_month_closing.iloc[0] - cdi_month_opening.iloc[0]
 ibov = yf.download("^BVSP", start=start_date, auto_adjust=True)["Close"]
 
 # Calculate moving averages
-ibov_ma = ta.sma(ibov, ma_months * 21)  # Average of 21 working days / month
+ibov_ma = ibov.rolling(window=ma_months * 21).mean()  # Average of 21 working days / month
 
 # Convert the index to datetime and sort the data by date in ascending order for all DataFrames
 ibov.index = pd.to_datetime(ibov.index)
@@ -108,8 +99,6 @@ ibov_ma = ibov_ma.sort_index(ascending=True)
 ibov_month_closing = ibov.resample("ME").last()
 ibov_ma_month_closing = ibov_ma.resample("ME").last()
 ibov_returns = ibov.resample("ME").last().pct_change().dropna()
-
-print(ibov_returns)
 
 # Calculate returns for the first month (missing previously)
 ibov_month_opening = ibov.resample("ME").first()
@@ -128,15 +117,15 @@ choices = pd.DataFrame(columns=["Moving Average Method"], index=ibov_returns.ind
 for index, date in enumerate(ibov_returns.index):
     if index < len(ibov_returns.index):
         if index > ma_months - 1:
-            if ibov_month_closing.iloc[index] > ibov_ma_month_closing.iloc[index]:
-                ma_returns = ibov_returns.iloc[index]
+            if ibov_month_closing.iloc[index].item() > ibov_ma_month_closing.iloc[index].item():
+                ma_returns = ibov_returns.iloc[index].item()
                 ma_choice = "IBOV"
             else:
-                ma_returns = cdi_returns.iloc[index]
+                ma_returns = cdi_returns.iloc[index].item()
                 ma_choice = "CDI"
         else:
             # For the first months, determine the 'Moving Average Method' as the CDI because of lack of data
-            ma_returns = cdi_returns.iloc[index]
+            ma_returns = cdi_returns.iloc[index].item()
             ma_choice = "CDI"
 
         returns.loc[date, "Moving Average Method"] = ma_returns
@@ -148,7 +137,7 @@ cumulative_returns = (1 + returns).cumprod() - 1
 # Graph
 #
 
-plt.style.use("./mplstyles/financialgraphs.mplstyle")
+apply_mpl_style()
 
 performance, axes = plt.subplots(figsize=(14, 8))
 
@@ -162,16 +151,7 @@ plt.ylabel("Performance")
 axes.set_title("Performance x Time")
 plt.legend(title=f'MA current investment: {choices["Moving Average Method"].iloc[len(ibov_returns.index) - 1]}')
 
-# Add hover tooltips using mplcursors
-cursor = mplcursors.cursor()
-
-
-@cursor.connect("add")
-def on_add(sel):
-    sel.annotation.get_bbox_patch().set(fc="gray", alpha=0.8)
-    sel.annotation.get_bbox_patch().set_edgecolor("gray")
-    sel.annotation.arrow_patch.set_color("white")
-    sel.annotation.arrow_patch.set_arrowstyle("-")
+setup_mplcursors()
 
 
 plt.show()

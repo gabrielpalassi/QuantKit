@@ -1,50 +1,42 @@
-import logging
-from datetime import datetime, date
 import yfinance as yf
 import pandas as pd
 import numpy as np
 from scipy import optimize
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mplticker
-import mplcursors
+import sys
+import os
+
+# Add the src directory to the path to import utils
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from utils import configure_yfinance_logging, get_start_date_input, setup_mplcursors, apply_mpl_style, print_with_separator
 
 #
 # Overview
 #
 
-print("\n#----------------------------- Program Overview -----------------------------#\n")
-print("This program performs the Markowitz Portfolio Optimization on a given set of assets.")
-print("It generates the portfolio weights according to the specified constrains. (user chosen)")
-print("- Sharpe Ratio: Highest relation return/risk.")
-print("- Return: Lowest risk for a specified expected return.")
-print("- Risk: Highest return for a specified (or lower) volatility (risk).")
-print("\n#----------------------------------------------------------------------------#\n")
+print_with_separator(
+    [
+        "Markowitz Portfolio Optimization",
+        "",
+        "This program determines optimal portfolio asset allocation using Modern Portfolio Theory.",
+        "",
+        "Optimization Objectives",
+        "- Maximize Sharpe Ratio: find the portfolio with the best risk-adjusted return",
+        "- Target Return: Achieve a specific expected return while minimizing risk",
+        "- Target Risk: Maximize return while keeping volatility at or below a specified level",
+        "Output",
+        "- Optimal portfolio weights for each asset",
+        "- Efficient frontier visualization",
+        "- Portfolio metrics (return, risk, Sharpe ratio)",
+    ]
+)
 
 #
 # Inputs
 #
 
-# Set the logging level for yfinance to CRITICAL to reduce noise
-logging.getLogger("yfinance").setLevel(logging.CRITICAL)
-
-
-def validate_date(input_date):
-    try:
-        # Check if the input matches the desired format (YYYY-MM-DD)
-        parsed_date = datetime.strptime(input_date, "%Y-%m-%d")
-        year, month, day = map(str, input_date.split("-"))
-        if len(year) == 4 and len(month) == 2 and len(day) == 2:
-            if parsed_date.date() < date.today():
-                return True
-            else:
-                print("The start date should be before today's date.")
-                return False
-        else:
-            print("Invalid date format. Please use YYYY-MM-DD format.")
-            return False
-    except:
-        print("Invalid date format. Please use YYYY-MM-DD format.")
-        return False
+configure_yfinance_logging()
 
 
 def validate_assets(asset_inputs, start_date):
@@ -85,11 +77,7 @@ def validate_assets(asset_inputs, start_date):
     return assets_df
 
 
-start_date = None
-while start_date is None:
-    start_date = input("Please input the analysis start date (YYYY-MM-DD): ")
-    if not validate_date(start_date):
-        start_date = None
+start_date = get_start_date_input()
 
 asset_tickers = None
 while asset_tickers is None:
@@ -204,7 +192,7 @@ for target_return in target_returns:
 # Graph
 #
 
-plt.style.use("./mplstyles/financialgraphs.mplstyle")
+apply_mpl_style()
 
 markowitz_optimization, axes = plt.subplots(figsize=(14, 8))
 
@@ -227,16 +215,7 @@ legend_text = "\n".join([f"{metric}: {metrics(optimal_weights)[i]:.2%}" for i, m
 legend_text = legend_text + "\n".join([f"{asset}'s weight: {i:.2%}" for asset, i in zip(assets.columns.tolist(), optimal_weights)]) + "\n"
 plt.legend(title=f"{legend_text}")
 
-# Enable cursor interaction on the graph
-cursor = mplcursors.cursor()
-
-
-@cursor.connect("add")
-def on_add(sel):
-    sel.annotation.get_bbox_patch().set(fc="gray", alpha=0.8)
-    sel.annotation.get_bbox_patch().set_edgecolor("gray")
-    sel.annotation.arrow_patch.set_color("white")
-    sel.annotation.arrow_patch.set_arrowstyle("-")
+setup_mplcursors()
 
 
 plt.show()

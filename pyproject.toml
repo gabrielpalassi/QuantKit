@@ -1,2 +1,28 @@
+[project]
+name = "FinancialMarketPython"
+version = "1.0.0"
+description = "A collection of financial analysis tools for portfolio management, risk assessment, and market data analysis"
+authors = [
+    { name = "Gabriel Palassi" }
+]
+readme = "docs/README.md"
+license = { file = "docs/LICENSE" }
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "ipykernel>=7.1.0,<7.2.0",
+    "matplotlib>=3.10.7,<3.11.0",
+    "mplcursors>=0.7,<0.8.0",
+    "numpy>=2.2.6,<2.3.0",
+    "pandas>=2.3.3,<2.4.0",
+    "pyqt6>=6.10.0,<6.11.0",
+    "python-bcb>=0.3.3,<0.4.0",
+    "scipy>=1.15.3,<1.16.0",
+    "yfinance>=0.2.66,<0.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/gabrielpalassi/FinancialMarketPython"
+Repository = "https://github.com/gabrielpalassi/FinancialMarketPython"
+
 [tool.black]
 line-length = 160
