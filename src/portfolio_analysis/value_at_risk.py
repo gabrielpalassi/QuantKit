@@ -1,10 +1,19 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import sys
 import os
 
 # Add the src directory to the path to import utils
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from utils import configure_yfinance_logging, get_start_date_input, get_asset_tickers_input, get_portfolio_weights, print_with_separator
+from utils import (
+    configure_yfinance_logging,
+    get_start_date_input,
+    get_asset_tickers_input,
+    get_portfolio_weights,
+    print_with_separator,
+    setup_mplcursors,
+    apply_mpl_style,
+)
 
 #
 # Overview
@@ -63,28 +72,43 @@ if calculation_type == "portfolio":
 # Calculate the VaR for each asset if assets was selected
 if calculation_type == "assets":
     var_results = []
+
+    # Store returns and VaR values for plotting
+    asset_daily_returns = {}
+    asset_monthly_returns = {}
+    asset_yearly_returns = {}
+    asset_daily_var = {}
+    asset_monthly_var = {}
+    asset_yearly_var = {}
+
     for ticker, asset_data in assets.items():
         var_results.append(f"{ticker}:")
 
         # Daily VaR
         daily_returns = asset_data.pct_change().dropna()
+        asset_daily_returns[ticker] = daily_returns[ticker].values  # Store for plotting
         ordered_daily_returns = np.sort(daily_returns[ticker].values)
         alpha_daily_position = int((1 - confidence_level) * len(ordered_daily_returns))
         daily_var = abs(ordered_daily_returns[alpha_daily_position] * 100)
+        asset_daily_var[ticker] = daily_var
         var_results.append(f"   Daily VaR ({confidence_level * 100}%): {daily_var:.2f}%")
 
         # Monthly VaR
         monthly_returns = asset_data.resample("ME").last().pct_change().dropna()
+        asset_monthly_returns[ticker] = monthly_returns[ticker].values  # Store for plotting
         ordered_monthly_returns = np.sort(monthly_returns[ticker].values)
         alpha_monthly_position = int((1 - confidence_level) * len(ordered_monthly_returns))
         monthly_var = abs(ordered_monthly_returns[alpha_monthly_position] * 100)
+        asset_monthly_var[ticker] = monthly_var
         var_results.append(f"   Monthly VaR ({confidence_level * 100}%): {monthly_var:.2f}%")
 
         # Yearly VaR
         yearly_returns = asset_data.resample("YE").last().pct_change().dropna()
+        asset_yearly_returns[ticker] = yearly_returns[ticker].values  # Store for plotting
         ordered_yearly_returns = np.sort(yearly_returns[ticker].values)
         alpha_yearly_position = int((1 - confidence_level) * len(ordered_yearly_returns))
         yearly_var = abs(ordered_yearly_returns[alpha_yearly_position] * 100)
+        asset_yearly_var[ticker] = yearly_var
         var_results.append(f"   Yearly VaR ({confidence_level * 100}%): {yearly_var:.2f}%")
 
     print_with_separator(var_results)
@@ -107,6 +131,7 @@ if calculation_type == "portfolio":
 
     # Daily VaR
     daily_returns = combined_asset_data.pct_change().dropna()
+    portfolio_daily_returns = daily_returns.values  # Store for plotting
     ordered_daily_returns = np.sort(daily_returns.values)
     alpha_daily_position = int((1 - confidence_level) * len(ordered_daily_returns))
     daily_var = abs(ordered_daily_returns[alpha_daily_position] * 100)
@@ -114,6 +139,7 @@ if calculation_type == "portfolio":
 
     # Monthly VaR
     monthly_returns = combined_asset_data.resample("ME").last().pct_change().dropna()
+    portfolio_monthly_returns = monthly_returns.values  # Store for plotting
     ordered_monthly_returns = np.sort(monthly_returns.values)
     alpha_monthly_position = int((1 - confidence_level) * len(ordered_monthly_returns))
     monthly_var = abs(ordered_monthly_returns[alpha_monthly_position] * 100)
@@ -121,9 +147,98 @@ if calculation_type == "portfolio":
 
     # Yearly VaR
     yearly_returns = combined_asset_data.resample("YE").last().pct_change().dropna()
+    portfolio_yearly_returns = yearly_returns.values  # Store for plotting
     ordered_yearly_returns = np.sort(yearly_returns.values)
     alpha_yearly_position = int((1 - confidence_level) * len(ordered_yearly_returns))
     yearly_var = abs(ordered_yearly_returns[alpha_yearly_position] * 100)
     var_results.append(f"   Yearly VaR ({confidence_level * 100}%): {yearly_var:.2f}%")
 
     print_with_separator(var_results)
+
+#
+# Graph
+#
+
+apply_mpl_style()
+
+if calculation_type == "assets":
+    # Create three separate plots (one for each time period) with all assets overlaid
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    # Generate a color map for different assets
+    colors = plt.cm.tab10(range(len(assets)))
+
+    # Daily Returns
+    for idx, ticker in enumerate(assets.keys()):
+        daily_rets = asset_daily_returns[ticker] * 100
+        axes[0].hist(daily_rets, bins=30, alpha=0.5, color=colors[idx], edgecolor="black", label=f"{ticker} (VaR: {asset_daily_var[ticker]:.2f}%)")
+        axes[0].axvline(x=-asset_daily_var[ticker], color=colors[idx], linestyle="--", linewidth=2, alpha=0.8)
+    axes[0].set_xlabel("Daily Returns (%)")
+    axes[0].set_ylabel("Frequency")
+    axes[0].set_title("Daily Returns Distribution")
+    axes[0].legend()
+    axes[0].grid(True, alpha=0.3)
+
+    # Monthly Returns
+    for idx, ticker in enumerate(assets.keys()):
+        monthly_rets = asset_monthly_returns[ticker] * 100
+        axes[1].hist(monthly_rets, bins=30, alpha=0.5, color=colors[idx], edgecolor="black", label=f"{ticker} (VaR: {asset_monthly_var[ticker]:.2f}%)")
+        axes[1].axvline(x=-asset_monthly_var[ticker], color=colors[idx], linestyle="--", linewidth=2, alpha=0.8)
+    axes[1].set_xlabel("Monthly Returns (%)")
+    axes[1].set_ylabel("Frequency")
+    axes[1].set_title("Monthly Returns Distribution")
+    axes[1].legend()
+    axes[1].grid(True, alpha=0.3)
+
+    # Yearly Returns
+    for idx, ticker in enumerate(assets.keys()):
+        yearly_rets = asset_yearly_returns[ticker] * 100
+        axes[2].hist(yearly_rets, bins=30, alpha=0.5, color=colors[idx], edgecolor="black", label=f"{ticker} (VaR: {asset_yearly_var[ticker]:.2f}%)")
+        axes[2].axvline(x=-asset_yearly_var[ticker], color=colors[idx], linestyle="--", linewidth=2, alpha=0.8)
+    axes[2].set_xlabel("Yearly Returns (%)")
+    axes[2].set_ylabel("Frequency")
+    axes[2].set_title("Yearly Returns Distribution")
+    axes[2].legend()
+    axes[2].grid(True, alpha=0.3)
+
+    plt.tight_layout()
+
+elif calculation_type == "portfolio":
+    # Create three subplots for portfolio (daily, monthly, yearly)
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    # Daily Returns
+    daily_rets = portfolio_daily_returns * 100
+    axes[0].hist(daily_rets, bins=30, alpha=0.7, color="blue", edgecolor="black")
+    axes[0].axvline(x=-daily_var, color="red", linestyle="--", linewidth=2, label=f"VaR: {daily_var:.2f}%")
+    axes[0].set_xlabel("Daily Returns (%)")
+    axes[0].set_ylabel("Frequency")
+    axes[0].set_title("Portfolio - Daily Returns Distribution")
+    axes[0].legend()
+    axes[0].grid(True, alpha=0.3)
+
+    # Monthly Returns
+    monthly_rets = portfolio_monthly_returns * 100
+    axes[1].hist(monthly_rets, bins=30, alpha=0.7, color="green", edgecolor="black")
+    axes[1].axvline(x=-monthly_var, color="red", linestyle="--", linewidth=2, label=f"VaR: {monthly_var:.2f}%")
+    axes[1].set_xlabel("Monthly Returns (%)")
+    axes[1].set_ylabel("Frequency")
+    axes[1].set_title("Portfolio - Monthly Returns Distribution")
+    axes[1].legend()
+    axes[1].grid(True, alpha=0.3)
+
+    # Yearly Returns
+    yearly_rets = portfolio_yearly_returns * 100
+    axes[2].hist(yearly_rets, bins=30, alpha=0.7, color="orange", edgecolor="black")
+    axes[2].axvline(x=-yearly_var, color="red", linestyle="--", linewidth=2, label=f"VaR: {yearly_var:.2f}%")
+    axes[2].set_xlabel("Yearly Returns (%)")
+    axes[2].set_ylabel("Frequency")
+    axes[2].set_title("Portfolio - Yearly Returns Distribution")
+    axes[2].legend()
+    axes[2].grid(True, alpha=0.3)
+
+    plt.tight_layout()
+
+setup_mplcursors()
+
+plt.show()
