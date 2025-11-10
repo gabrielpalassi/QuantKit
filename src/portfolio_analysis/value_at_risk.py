@@ -165,14 +165,16 @@ if calculation_type == "assets":
     # Create three separate plots (one for each time period) with all assets overlaid
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
 
-    # Generate a color map for different assets
-    colors = plt.cm.tab10(range(len(assets)))
+    # Get colors from the style's color cycle
+    prop_cycle = plt.rcParams["axes.prop_cycle"]
+    colors = prop_cycle.by_key()["color"]
 
     # Daily Returns
     for idx, ticker in enumerate(assets.keys()):
         daily_rets = asset_daily_returns[ticker] * 100
-        axes[0].hist(daily_rets, bins=30, alpha=0.5, color=colors[idx], edgecolor="black", label=f"{ticker} (VaR: {asset_daily_var[ticker]:.2f}%)")
-        axes[0].axvline(x=-asset_daily_var[ticker], color=colors[idx], linestyle="--", linewidth=2, alpha=0.8)
+        color = colors[idx % len(colors)]  # Cycle through colors if more assets than colors
+        axes[0].hist(daily_rets, bins=30, alpha=0.5, color=color, edgecolor="black", label=f"{ticker} (VaR: {asset_daily_var[ticker]:.2f}%)")
+        axes[0].axvline(x=-asset_daily_var[ticker], color=color, linestyle="--", linewidth=2, alpha=0.8)
     axes[0].set_xlabel("Daily Returns (%)")
     axes[0].set_ylabel("Frequency")
     axes[0].set_title("Daily Returns Distribution")
@@ -182,8 +184,9 @@ if calculation_type == "assets":
     # Monthly Returns
     for idx, ticker in enumerate(assets.keys()):
         monthly_rets = asset_monthly_returns[ticker] * 100
-        axes[1].hist(monthly_rets, bins=30, alpha=0.5, color=colors[idx], edgecolor="black", label=f"{ticker} (VaR: {asset_monthly_var[ticker]:.2f}%)")
-        axes[1].axvline(x=-asset_monthly_var[ticker], color=colors[idx], linestyle="--", linewidth=2, alpha=0.8)
+        color = colors[idx % len(colors)]  # Cycle through colors if more assets than colors
+        axes[1].hist(monthly_rets, bins=30, alpha=0.5, color=color, edgecolor="black", label=f"{ticker} (VaR: {asset_monthly_var[ticker]:.2f}%)")
+        axes[1].axvline(x=-asset_monthly_var[ticker], color=color, linestyle="--", linewidth=2, alpha=0.8)
     axes[1].set_xlabel("Monthly Returns (%)")
     axes[1].set_ylabel("Frequency")
     axes[1].set_title("Monthly Returns Distribution")
@@ -193,8 +196,9 @@ if calculation_type == "assets":
     # Yearly Returns
     for idx, ticker in enumerate(assets.keys()):
         yearly_rets = asset_yearly_returns[ticker] * 100
-        axes[2].hist(yearly_rets, bins=30, alpha=0.5, color=colors[idx], edgecolor="black", label=f"{ticker} (VaR: {asset_yearly_var[ticker]:.2f}%)")
-        axes[2].axvline(x=-asset_yearly_var[ticker], color=colors[idx], linestyle="--", linewidth=2, alpha=0.8)
+        color = colors[idx % len(colors)]  # Cycle through colors if more assets than colors
+        axes[2].hist(yearly_rets, bins=30, alpha=0.5, color=color, edgecolor="black", label=f"{ticker} (VaR: {asset_yearly_var[ticker]:.2f}%)")
+        axes[2].axvline(x=-asset_yearly_var[ticker], color=color, linestyle="--", linewidth=2, alpha=0.8)
     axes[2].set_xlabel("Yearly Returns (%)")
     axes[2].set_ylabel("Frequency")
     axes[2].set_title("Yearly Returns Distribution")
@@ -207,10 +211,14 @@ elif calculation_type == "portfolio":
     # Create three subplots for portfolio (daily, monthly, yearly)
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
 
+    # Get colors from the style's color cycle
+    prop_cycle = plt.rcParams["axes.prop_cycle"]
+    colors = prop_cycle.by_key()["color"]
+
     # Daily Returns
     daily_rets = portfolio_daily_returns * 100
-    axes[0].hist(daily_rets, bins=30, alpha=0.7, color="blue", edgecolor="black")
-    axes[0].axvline(x=-daily_var, color="red", linestyle="--", linewidth=2, label=f"VaR: {daily_var:.2f}%")
+    axes[0].hist(daily_rets, bins=30, alpha=0.7, color=colors[0], edgecolor="black")
+    axes[0].axvline(x=-daily_var, color=colors[4], linestyle="--", linewidth=2, label=f"VaR: {daily_var:.2f}%")
     axes[0].set_xlabel("Daily Returns (%)")
     axes[0].set_ylabel("Frequency")
     axes[0].set_title("Portfolio - Daily Returns Distribution")
@@ -219,8 +227,8 @@ elif calculation_type == "portfolio":
 
     # Monthly Returns
     monthly_rets = portfolio_monthly_returns * 100
-    axes[1].hist(monthly_rets, bins=30, alpha=0.7, color="green", edgecolor="black")
-    axes[1].axvline(x=-monthly_var, color="red", linestyle="--", linewidth=2, label=f"VaR: {monthly_var:.2f}%")
+    axes[1].hist(monthly_rets, bins=30, alpha=0.7, color=colors[1], edgecolor="black")
+    axes[1].axvline(x=-monthly_var, color=colors[4], linestyle="--", linewidth=2, label=f"VaR: {monthly_var:.2f}%")
     axes[1].set_xlabel("Monthly Returns (%)")
     axes[1].set_ylabel("Frequency")
     axes[1].set_title("Portfolio - Monthly Returns Distribution")
@@ -229,8 +237,8 @@ elif calculation_type == "portfolio":
 
     # Yearly Returns
     yearly_rets = portfolio_yearly_returns * 100
-    axes[2].hist(yearly_rets, bins=30, alpha=0.7, color="orange", edgecolor="black")
-    axes[2].axvline(x=-yearly_var, color="red", linestyle="--", linewidth=2, label=f"VaR: {yearly_var:.2f}%")
+    axes[2].hist(yearly_rets, bins=30, alpha=0.7, color=colors[2], edgecolor="black")
+    axes[2].axvline(x=-yearly_var, color=colors[4], linestyle="--", linewidth=2, label=f"VaR: {yearly_var:.2f}%")
     axes[2].set_xlabel("Yearly Returns (%)")
     axes[2].set_ylabel("Frequency")
     axes[2].set_title("Portfolio - Yearly Returns Distribution")
