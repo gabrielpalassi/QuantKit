@@ -4,7 +4,7 @@ A comprehensive suite of Python-based financial analysis tools for portfolio man
 
 ## Getting Started
 
-To use the programs in this repository, you'll need Python and [uv](https://docs.astral.sh/uv/) installed. After having Python and uv installed, you can set up the project as follows:
+To get started, ensure you have Python and [uv](https://docs.astral.sh/uv/) installed on your system. Once both are set up, follow these steps to configure the project:
 
 ### Running
 
@@ -29,7 +29,7 @@ uv sync
 Now you're ready to use the programs!
 
 ```bash
-uv run python main.py
+uv run main.py
 ```
 
 ## Programs Overview
