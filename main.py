@@ -31,11 +31,12 @@ def display_menu():
             "   3. Drawdown Calculator",
             "   4. Value at Risk (VaR) Calculator",
             "Strategy Backtests",
-            "   5. Last Month Performance (LMP) Method Backtest",
-            "   6. Moving Average (MA) Method Backtest",
+            "   5. Last Month Performance (LMP) Strategy Backtest",
+            "   6. Moving Average (MA) Strategy Backtest",
+            "   7. Bollinger Bands Backtest",
             "Market Data",
-            "   7. Brazilian Central Bank Historical Data",
-            "   8. Brazilian Central Bank Market Expectations",
+            "   8. Brazilian Central Bank Historical Data",
+            "   9. Brazilian Central Bank Market Expectations",
             "Other",
             "   0. Exit",
         ]
@@ -65,15 +66,16 @@ def main():
         "2": ("portfolio_analysis", "markowitz_optimization.py", "Markowitz Optimization"),
         "3": ("portfolio_analysis", "drawdown.py", "Drawdown Calculator"),
         "4": ("portfolio_analysis", "value_at_risk.py", "Value at Risk"),
-        "5": ("strategy_backtests", "lmp_method_backtest.py", "LMP Method Backtest"),
-        "6": ("strategy_backtests", "ma_method_backtest.py", "MA Method Backtest"),
-        "7": ("market_data", "bcb_historical_data.py", "BCB Historical Data"),
-        "8": ("market_data", "bcb_market_expectations.py", "BCB Market Expectations"),
+        "5": ("strategy_backtests", "lmp_strategy.py", "LMP Strategy Backtest"),
+        "6": ("strategy_backtests", "ma_strategy.py", "MA Strategy Backtest"),
+        "7": ("strategy_backtests", "bollinger_bands_strategy.py", "Bollinger Bands Backtest"),
+        "8": ("market_data", "bcb_historical_data.py", "BCB Historical Data"),
+        "9": ("market_data", "bcb_market_expectations.py", "BCB Market Expectations"),
     }
 
     while True:
         display_menu()
-        choice = input("Select an option (0-8): ").strip()
+        choice = input("Select an option (0-9): ").strip()
 
         if choice == "0":
             clear_screen()

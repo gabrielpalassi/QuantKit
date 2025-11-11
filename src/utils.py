@@ -69,13 +69,14 @@ def get_start_date_input(max_days_from_today=None):
     return start_date
 
 
-def validate_assets(asset_inputs, start_date):
+def validate_assets(asset_inputs, start_date, single_asset=False):
     """
     Validate and download asset data from yfinance.
 
     Args:
         asset_inputs (str): Comma-separated asset ticker symbols.
         start_date (str): The start date for downloading data in YYYY-MM-DD format.
+        single_asset (bool): Whether to expect a single asset ticker or multiple.
 
     Returns:
         dict: A dictionary with ticker symbols as keys and downloaded data as values.
@@ -85,34 +86,49 @@ def validate_assets(asset_inputs, start_date):
     for ticker in asset_tickers:
         # Remove leading/trailing spaces
         ticker = ticker.strip()
+
         # Download asset data using yfinance
         downloaded_data = yf.download(ticker, start_date, auto_adjust=True)
         if downloaded_data is None or downloaded_data.empty:
             raise ValueError(f"No data found for ticker '{ticker}'.")
         asset_data = downloaded_data["Close"]
+
         if len(asset_data) > 0:
             # Store asset data if successfully downloaded
             assets[ticker] = asset_data
+
+    if single_asset and len(assets) > 1:
+        raise ValueError("Multiple assets provided, but a single asset was expected.")
+
     return assets
 
 
-def get_asset_tickers_input(start_date):
+def get_asset_tickers_input(start_date, single_asset=False):
     """
     Prompt the user for asset ticker symbols and validate them.
 
     Args:
         start_date (str): The start date for downloading data in YYYY-MM-DD format.
+        single_asset (bool): Whether to expect a single asset ticker or multiple.
 
     Returns:
         dict: A dictionary with valid ticker symbols as keys and downloaded data as values.
     """
-    asset_tickers = None
-    while asset_tickers is None:
-        asset_tickers = input("Specify the asset ticker symbols (comma-separated): ")
-        assets = validate_assets(asset_tickers, start_date)
-        if not assets:
-            print("No valid assets found. Please enter at least one valid asset ticker symbol.")
-            asset_tickers = None
+    assets = None
+    while assets is None:
+        try:
+            if single_asset:
+                asset_tickers = input("Specify the asset ticker symbol: ")
+                assets = validate_assets(asset_tickers, start_date, single_asset=True)
+            else:
+                asset_tickers = input("Specify the asset ticker symbols (comma-separated): ")
+                assets = validate_assets(asset_tickers, start_date)
+            if not assets:
+                print("No valid assets found. Please enter at least one valid asset ticker symbol.")
+                assets = None
+        except ValueError as e:
+            print(f"Error: {e}")
+            assets = None
     return assets
 
 

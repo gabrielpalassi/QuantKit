@@ -36,53 +36,65 @@ uv run main.py
 
 Below are the financial analysis tools available in this repository. Each program provides detailed instructions when executed.
 
-### Portfolio Backtest
+### Portfolio Analysis
+
+#### Portfolio Backtest
 
 Backtest a weighted portfolio to evaluate historical performance. This tool calculates cumulative returns for your entire portfolio and compares it against individual asset performance, providing insights into how your asset allocation performed over time.
 
 <img src="./images/portfolio-backtest.png" width=612.5>
 
-### Markowitz Portfolio Optimization
+#### Markowitz Portfolio Optimization
 
 Optimize portfolio asset allocation using Modern Portfolio Theory. Visualize the efficient frontier and find optimal portfolio weights based on three strategies: maximizing the Sharpe ratio for best risk-adjusted returns, targeting a specific expected return with minimal risk, or maximizing returns within a defined risk tolerance.
 
 <img src="./images/markowitz-optimization.png" width=612.5>
 
-### Drawdown Calculator
+#### Drawdown Calculator
 
 Analyze drawdown patterns to understand potential losses from peak values. This tool calculates and visualizes the maximum drawdown for individual assets or entire portfolios, helping you assess historical downside risk.
 
 <img src="./images/drawdown.png" width=612.5>
 
-### Value at Risk (VaR) Calculator
+#### Value at Risk (VaR) Calculator
 
 Calculate Value at Risk using historical simulation methodology. Estimate potential losses at customizable confidence levels (e.g., 95%, 99%) for individual assets or portfolios across daily, monthly, and yearly periods, providing a comprehensive risk assessment.
 
 <img src="./images/value-at-risk.png" width=612.5>
 
-### Brazilian Central Bank Historical Data
+### Strategy Backtests
+
+#### Last Month Performance Strategy Backtest
+
+Evaluate a momentum-based investment strategy that allocates capital based on prior month performance. This model invests in IBOV (Brazilian stock index) when it outperformed CDI (Brazilian risk-free rate) in the previous month, and switches to CDI otherwise.
+
+<img src="./images/lmp-strategy.png" width=612.5>
+
+#### Moving Average Strategy Backtest
+
+Test a trend-following strategy using moving averages as entry and exit signals. This model invests in IBOV when the previous month's closing price exceeds the moving average, indicating an uptrend, and allocates to CDI during downtrends for capital preservation.
+
+<img src="./images/ma-strategy.png" width=612.5>
+
+#### Bollinger Bands Strategy Backtest
+
+Backtest a mean reversion strategy using Bollinger Bands technical indicator. This tool generates long signals when price crosses below the lower band (expecting reversion upward) and short signals when price crosses above the upper band (expecting reversion downward). Customizable window periods and standard deviation multipliers allow you to fine-tune the strategy parameters.
+
+<img src="./images/bollinger-bands-strategy.png" width=612.5>
+
+### Market Data
+
+#### Brazilian Central Bank Historical Data
 
 Access and analyze historical economic data from the Brazilian Central Bank (Banco Central do Brasil). Query various indicators including interest rates (SELIC), inflation metrics (IPCA, IGP-M), and exchange rates to support macroeconomic analysis.
 
 <img src="./images/bcb-historical-data.png" width=612.5>
 
-### Brazilian Central Bank Market Expectations
+#### Brazilian Central Bank Market Expectations
 
 Retrieve market expectations data compiled by the Brazilian Central Bank through its FOCUS survey. Analyze consensus forecasts for key economic indicators such as interest rates, inflation, exchange rates, and GDP growth to inform investment decisions.
 
 <img src="./images/bcb-market-expectations.png" width=612.5>
-
-### Last Month Performance Method Backtest
-
-Evaluate a momentum-based investment strategy that allocates capital based on prior month performance. This model invests in IBOV (Brazilian stock index) when it outperformed CDI (Brazilian risk-free rate) in the previous month, and switches to CDI otherwise.
-
-<img src="./images/lmp-method-backtest.png" width=612.5>
-
-### Moving Average Method Backtest
-
-Test a trend-following strategy using moving averages as entry and exit signals. This model invests in IBOV when the previous month's closing price exceeds the moving average, indicating an uptrend, and allocates to CDI during downtrends for capital preservation.
-
-<img src="./images/ma-method-backtest.png" width=612.5>
 
 ## Contributing
 

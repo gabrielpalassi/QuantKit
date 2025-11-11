@@ -17,7 +17,7 @@ from utils import configure_yfinance_logging, get_start_date_input, apply_mpl_st
 
 print_with_separator(
     [
-        "Strategy Backtest: Moving Average Method",
+        "Strategy Backtest: Moving Average Strategy",
         "",
         "This program backtests a technical analysis-based tactical asset allocation strategy.",
         "",
@@ -108,11 +108,11 @@ first_month_ibov_returns = (ibov_month_closing.iloc[0] - ibov_month_opening.iloc
 # Model
 #
 
-returns = pd.DataFrame(columns=["CDI", "IBOV", "Moving Average Method"], index=ibov_returns.index)
+returns = pd.DataFrame(columns=["CDI", "IBOV", "Moving Average Strategy"], index=ibov_returns.index)
 returns["CDI"] = cdi_returns
 returns["IBOV"] = ibov_returns
 
-choices = pd.DataFrame(columns=["Moving Average Method"], index=ibov_returns.index)
+choices = pd.DataFrame(columns=["Moving Average Strategy"], index=ibov_returns.index)
 
 for index, date in enumerate(ibov_returns.index):
     if index < len(ibov_returns.index):
@@ -124,12 +124,12 @@ for index, date in enumerate(ibov_returns.index):
                 ma_returns = cdi_returns.iloc[index].item()
                 ma_choice = "CDI"
         else:
-            # For the first months, determine the 'Moving Average Method' as the CDI because of lack of data
+            # For the first months, determine the 'Moving Average Strategy' as the CDI because of lack of data
             ma_returns = cdi_returns.iloc[index].item()
             ma_choice = "CDI"
 
-        returns.loc[date, "Moving Average Method"] = ma_returns
-        choices.loc[date, "Moving Average Method"] = ma_choice
+        returns.loc[date, "Moving Average Strategy"] = ma_returns
+        choices.loc[date, "Moving Average Strategy"] = ma_choice
 
 cumulative_returns = (1 + returns).cumprod() - 1
 
@@ -143,13 +143,13 @@ performance, axes = plt.subplots(figsize=(14, 8))
 
 axes.plot(cumulative_returns["CDI"], label="CDI")
 axes.plot(cumulative_returns["IBOV"], label="IBOV")
-axes.plot(cumulative_returns["Moving Average Method"], label="Moving Average Method")
+axes.plot(cumulative_returns["Moving Average Strategy"], label="Moving Average Strategy")
 
 axes.yaxis.set_major_formatter(ticker.PercentFormatter(1.0))
 plt.xlabel("Time")
 plt.ylabel("Performance")
 axes.set_title("Performance x Time")
-plt.legend(title=f'MA current investment: {choices["Moving Average Method"].iloc[len(ibov_returns.index) - 1]}')
+plt.legend(title=f'MA current investment: {choices["Moving Average Strategy"].iloc[len(ibov_returns.index) - 1]}')
 
 setup_mplcursors()
 

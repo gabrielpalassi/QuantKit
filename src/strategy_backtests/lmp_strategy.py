@@ -17,7 +17,7 @@ from utils import configure_yfinance_logging, get_start_date_input, apply_mpl_st
 
 print_with_separator(
     [
-        "Strategy Backtest: Last Month Performance Method",
+        "Strategy Backtest: Last Month Performance Strategy",
         "",
         "This program backtests a momentum-based tactical asset allocation strategy.",
         "",
@@ -82,11 +82,11 @@ first_month_ibov_returns = (ibov_month_closing.iloc[0] - ibov_month_opening.iloc
 # Model
 #
 
-returns = pd.DataFrame(columns=["CDI", "IBOV", "Last Month Perf. Method"], index=ibov_returns.index)
+returns = pd.DataFrame(columns=["CDI", "IBOV", "Last Month Perf. Strategy"], index=ibov_returns.index)
 returns["CDI"] = cdi_returns
 returns["IBOV"] = ibov_returns
 
-choices = pd.DataFrame(columns=["Last Month Perf. Method"], index=ibov_returns.index)
+choices = pd.DataFrame(columns=["Last Month Perf. Strategy"], index=ibov_returns.index)
 
 for index, date in enumerate(ibov_returns.index):
     if index < len(ibov_returns.index):
@@ -105,8 +105,8 @@ for index, date in enumerate(ibov_returns.index):
                 lm_returns = cdi_returns.iloc[index].item()
                 lm_choice = "CDI"
 
-        returns.loc[date, "Last Month Perf. Method"] = lm_returns
-        choices.loc[date, "Last Month Perf. Method"] = lm_choice
+        returns.loc[date, "Last Month Perf. Strategy"] = lm_returns
+        choices.loc[date, "Last Month Perf. Strategy"] = lm_choice
 
 cumulative_returns = (1 + returns).cumprod() - 1
 
@@ -120,13 +120,13 @@ performance, axes = plt.subplots(figsize=(14, 8))
 
 axes.plot(cumulative_returns["CDI"], label="CDI")
 axes.plot(cumulative_returns["IBOV"], label="IBOV")
-axes.plot(cumulative_returns["Last Month Perf. Method"], label="Last Month Perf. Method")
+axes.plot(cumulative_returns["Last Month Perf. Strategy"], label="Last Month Perf. Strategy")
 
 axes.yaxis.set_major_formatter(ticker.PercentFormatter(1.0))
 plt.xlabel("Time")
 plt.ylabel("Performance")
 axes.set_title("Performance x Time")
-plt.legend(title=f'LMP current investment: {choices["Last Month Perf. Method"].iloc[len(ibov_returns.index) - 1]}')
+plt.legend(title=f'LMP current investment: {choices["Last Month Perf. Strategy"].iloc[len(ibov_returns.index) - 1]}')
 
 setup_mplcursors()
 

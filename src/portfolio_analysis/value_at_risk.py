@@ -163,7 +163,7 @@ apply_mpl_style()
 
 if calculation_type == "assets":
     # Create three separate plots (one for each time period) with all assets overlaid
-    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+    fig, axes = plt.subplots(1, 3, figsize=(14, 8))
 
     # Get colors from the style's color cycle
     prop_cycle = plt.rcParams["axes.prop_cycle"]
@@ -205,11 +205,9 @@ if calculation_type == "assets":
     axes[2].legend()
     axes[2].grid(True, alpha=0.3)
 
-    plt.tight_layout()
-
 elif calculation_type == "portfolio":
     # Create three subplots for portfolio (daily, monthly, yearly)
-    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+    fig, axes = plt.subplots(1, 3, figsize=(14, 8))
 
     # Get colors from the style's color cycle
     prop_cycle = plt.rcParams["axes.prop_cycle"]
@@ -244,8 +242,6 @@ elif calculation_type == "portfolio":
     axes[2].set_title("Portfolio - Yearly Returns Distribution")
     axes[2].legend()
     axes[2].grid(True, alpha=0.3)
-
-    plt.tight_layout()
 
 setup_mplcursors()
 
