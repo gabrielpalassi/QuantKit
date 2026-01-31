@@ -7,7 +7,7 @@ import os
 
 # Add the src directory to the path to import utils
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from utils import configure_yfinance_logging, get_start_date_input, apply_mpl_style, setup_mplcursors, print_with_separator, get_asset_tickers_input
+from utils import configure_yfinance_logging, get_start_date_input, apply_mpl_style, setup_mplcursors, print_with_separator, fetch_asset_ticker_input
 
 #
 # Overview
@@ -58,7 +58,7 @@ def validate_positive_float(input_value):
 start_date = get_start_date_input()
 
 # Get asset ticker and validate
-asset = get_asset_tickers_input(start_date, single_asset=True)
+asset = fetch_asset_ticker_input(start_date, single_asset=True)
 asset_ticker = list(asset.keys())[0]  # Get the single asset ticker from the dictionary
 asset_data = asset[asset_ticker][asset_ticker]
 

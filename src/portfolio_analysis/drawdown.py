@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from utils import (
     configure_yfinance_logging,
     get_start_date_input,
-    get_asset_tickers_input,
+    fetch_asset_ticker_input,
     get_portfolio_weights,
     setup_mplcursors,
     apply_mpl_style,
@@ -47,7 +47,7 @@ drawdown_type = input("Do you want the drawdown of individual assets or of the p
 while drawdown_type not in ["assets", "portfolio"]:
     drawdown_type = input('Invalid input. Please enter "assets" or "portfolio": ')
 
-assets = get_asset_tickers_input(start_date)
+assets = fetch_asset_ticker_input(start_date)
 
 # If calculating VaR for a portfolio, gather asset weights
 asset_weights = {}

@@ -69,7 +69,7 @@ def get_start_date_input(max_days_from_today=None):
     return start_date
 
 
-def validate_assets(asset_inputs, start_date, single_asset=False):
+def validate_and_fetch_assets(asset_inputs, start_date, single_asset=False):
     """
     Validate and download asset data from yfinance.
 
@@ -103,7 +103,7 @@ def validate_assets(asset_inputs, start_date, single_asset=False):
     return assets
 
 
-def get_asset_tickers_input(start_date, single_asset=False):
+def fetch_asset_ticker_input(start_date, single_asset=False):
     """
     Prompt the user for asset ticker symbols and validate them.
 
@@ -119,10 +119,10 @@ def get_asset_tickers_input(start_date, single_asset=False):
         try:
             if single_asset:
                 asset_tickers = input("Specify the asset ticker symbol: ")
-                assets = validate_assets(asset_tickers, start_date, single_asset=True)
+                assets = validate_and_fetch_assets(asset_tickers, start_date, single_asset=True)
             else:
                 asset_tickers = input("Specify the asset ticker symbols (comma-separated): ")
-                assets = validate_assets(asset_tickers, start_date)
+                assets = validate_and_fetch_assets(asset_tickers, start_date)
             if not assets:
                 print("No valid assets found. Please enter at least one valid asset ticker symbol.")
                 assets = None
