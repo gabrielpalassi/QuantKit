@@ -5,8 +5,9 @@ description = "A collection of financial analysis tools for portfolio management
 authors = [
     { name = "Gabriel Palassi" }
 ]
-readme = "docs/README.md"
-license = { file = "docs/LICENSE" }
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
 requires-python = ">=3.12,<3.14"
 dependencies = [
     "ipykernel>=7.1.0,<7.2.0",
@@ -26,3 +27,12 @@ Repository = "https://github.com/gabrielpalassi/FinancialMarketPython"
 
 [tool.black]
 line-length = 160
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3,<9.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

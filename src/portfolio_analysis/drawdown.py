@@ -1,11 +1,15 @@
+#
+# Imports
+#
+
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mplticker
-import pandas as pd
 import sys
 import os
 
-# Add the src directory to the path to import utils
+# Local imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from portfolio_analysis.utils import drawdown_series, price_series, weighted_portfolio_prices
 from utils import (
     configure_yfinance_logging,
     get_start_date_input,
@@ -16,93 +20,88 @@ from utils import (
     print_with_separator,
 )
 
-#
-# Overview
-#
 
-print_with_separator(
-    [
-        "Drawdown Analysis",
-        "",
-        "This program calculates and visualizes portfolio risk through drawdown analysis.",
-        "",
-        "Analysis Options",
-        "- Individual Assets: Analyze drawdown for each asset separately",
-        "- Portfolio: Analyze weighted portfolio drawdown",
-        "Output",
-        "- Interactive drawdown charts over time",
-        "- Maximum drawdown value for each asset/portfolio",
-    ]
-)
+def main() -> None:
+    #
+    # Overview
+    #
 
-#
-# Inputs
-#
+    print_with_separator(
+        [
+            "Drawdown Analysis",
+            "",
+            "This program calculates and visualizes portfolio risk through drawdown analysis.",
+            "",
+            "Analysis Options",
+            "- Individual Assets: Analyze drawdown for each asset separately",
+            "- Portfolio: Analyze weighted portfolio drawdown",
+            "Output",
+            "- Interactive drawdown charts over time",
+            "- Maximum drawdown value for each asset/portfolio",
+        ]
+    )
 
-configure_yfinance_logging()
+    #
+    # Inputs
+    #
 
-start_date = get_start_date_input()
+    configure_yfinance_logging()
 
-drawdown_type = input("Do you want the drawdown of individual assets or of the portfolio? (assets/portfolio): ")
-while drawdown_type not in ["assets", "portfolio"]:
-    drawdown_type = input('Invalid input. Please enter "assets" or "portfolio": ')
+    start_date = get_start_date_input()
 
-assets = fetch_asset_ticker_input(start_date)
+    drawdown_type = input("Do you want the drawdown of individual assets or of the portfolio? (assets/portfolio): ")
+    while drawdown_type not in ["assets", "portfolio"]:
+        drawdown_type = input('Invalid input. Please enter "assets" or "portfolio": ')
 
-# If calculating VaR for a portfolio, gather asset weights
-asset_weights = {}
-if drawdown_type == "portfolio":
-    asset_weights = get_portfolio_weights(assets)
+    assets = fetch_asset_ticker_input(start_date)
 
-#
-# Drawdown
-#
+    # If calculating VaR for a portfolio, gather asset weights
+    asset_weights = {}
+    if drawdown_type == "portfolio":
+        asset_weights = get_portfolio_weights(assets)
 
-# Calculate the maximum drawdown for each asset and store the results in a dictionary
-max_drawdowns = {}
-for ticker, asset_data in assets.items():
-    asset_data_max = asset_data.cummax()
-    drawdowns = (asset_data - asset_data_max) / asset_data_max
-    drawdown_max = drawdowns.min()
-    max_drawdowns[ticker] = drawdown_max
+    #
+    # Drawdown
+    #
 
-# Calculate the maximum drawdown of the portfolio if portfolio was selected
-if drawdown_type == "portfolio":
-    combined_asset_data = None
+    # Calculate the maximum drawdown for each asset and store the results in a dictionary
+    max_drawdowns = {}
     for ticker, asset_data in assets.items():
-        weighted_asset_data = asset_data[ticker] * asset_weights[ticker]
-        if combined_asset_data is None:
-            combined_asset_data = weighted_asset_data
-        else:
-            combined_asset_data += weighted_asset_data
+        asset_drawdowns = drawdown_series(price_series(asset_data, ticker))
+        max_drawdowns[ticker] = asset_drawdowns.min()
 
-    combined_asset_data_max = combined_asset_data.cummax()
-    combined_portfolio_drawdowns = (combined_asset_data - combined_asset_data_max) / combined_asset_data_max
-    max_drawdowns["Portfolio"] = pd.Series(combined_portfolio_drawdowns.min())
+    # Calculate the maximum drawdown of the portfolio if portfolio was selected
+    if drawdown_type == "portfolio":
+        combined_asset_data = weighted_portfolio_prices(assets, asset_weights)
+        combined_portfolio_drawdowns = drawdown_series(combined_asset_data)
+        max_drawdowns["Portfolio"] = combined_portfolio_drawdowns.min()
 
-#
-# Graph
-#
+    #
+    # Graph
+    #
 
-apply_mpl_style()
+    apply_mpl_style()
 
-drawdown, axes = plt.subplots(figsize=(14, 8))
+    _, axes = plt.subplots(figsize=(14, 8))
 
-if drawdown_type == "assets":
-    for ticker, asset_data in assets.items():
-        drawdowns = (asset_data - asset_data.cummax()) / asset_data.cummax()
-        axes.plot(drawdowns, label=ticker)
-elif drawdown_type == "portfolio":
-    axes.plot(combined_portfolio_drawdowns, label="Portfolio")
+    if drawdown_type == "assets":
+        for ticker, asset_data in assets.items():
+            axes.plot(drawdown_series(price_series(asset_data, ticker)), label=ticker)
+    elif drawdown_type == "portfolio":
+        axes.plot(combined_portfolio_drawdowns, label="Portfolio")
 
-axes.yaxis.set_major_formatter(mplticker.PercentFormatter(1.0))
-plt.xlabel("Time")
-plt.ylabel("Drawdown")
-axes.set_title("Drawdown x Time")
+    axes.yaxis.set_major_formatter(mplticker.PercentFormatter(1.0))
+    plt.xlabel("Time")
+    plt.ylabel("Drawdown")
+    axes.set_title("Drawdown x Time")
 
-legend_text = "\n".join([f"{ticker}: {float(max_drawdown.iloc[0]):.2%}" for ticker, max_drawdown in max_drawdowns.items()]) + "\n"
-plt.legend(title=f"Max. Drawdowns:\n\n{legend_text}")
+    legend_text = "\n".join([f"{ticker}: {max_drawdown:.2%}" for ticker, max_drawdown in max_drawdowns.items()]) + "\n"
+    plt.legend(title=f"Max. Drawdowns:\n\n{legend_text}")
 
-setup_mplcursors()
+    setup_mplcursors()
 
-plt.show()
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()

@@ -5,6 +5,7 @@
 *.so
 
 # Virtual Environments
+.venv
 .venv/
 venv/
 env/

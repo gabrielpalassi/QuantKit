@@ -1,27 +1,26 @@
-"""
-FinancialMarketPython - Main Entry Point
-
-A collection of financial analysis tools for portfolio management,
-risk assessment, strategy backtesting, and market data analysis.
-"""
+#
+# Imports
+#
 
 import sys
 import subprocess
 from pathlib import Path
 import os
 
-# Add the src directory to the path to import utils
+# Local imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 from utils import print_with_separator
 
+#
+# Functions
+#
+
 
 def clear_screen():
-    """Clear the terminal screen."""
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def display_menu():
-    """Display the main menu with all available tools."""
     clear_screen()
     print_with_separator(
         [
@@ -30,13 +29,13 @@ def display_menu():
             "   2. Markowitz Portfolio Optimization",
             "   3. Drawdown Calculator",
             "   4. Value at Risk (VaR) Calculator",
-            "Strategy Backtests",
-            "   5. Last Month Performance (LMP) Strategy Backtest",
-            "   6. Moving Average (MA) Strategy Backtest",
-            "   7. Bollinger Bands Backtest",
             "Market Data",
-            "   8. Brazilian Central Bank Historical Data",
-            "   9. Brazilian Central Bank Market Expectations",
+            "   5. Brazilian Central Bank Historical Data",
+            "   6. Brazilian Central Bank Market Expectations",
+            "Strategies",
+            "   7. Relative Momentum Allocation Backtest",
+            "   8. Moving Average Allocation Backtest",
+            "   9. Bollinger Bands Backtest",
             "Other",
             "   0. Exit",
         ]
@@ -44,7 +43,6 @@ def display_menu():
 
 
 def run_script(script_path: Path):
-    """Run a Python script and wait for it to complete."""
     try:
         subprocess.run([sys.executable, str(script_path)], check=True)
     except subprocess.CalledProcessError as e:
@@ -54,23 +52,26 @@ def run_script(script_path: Path):
 
 
 def get_script_path(category: str, script_name: str) -> Path:
-    """Get the full path to a script."""
     base_path = Path(__file__).parent / "src" / category
     return base_path / script_name
 
 
+#
+# Main
+#
+
+
 def main():
-    """Main application loop."""
     scripts = {
         "1": ("portfolio_analysis", "portfolio_backtest.py", "Portfolio Backtest"),
         "2": ("portfolio_analysis", "markowitz_optimization.py", "Markowitz Optimization"),
         "3": ("portfolio_analysis", "drawdown.py", "Drawdown Calculator"),
         "4": ("portfolio_analysis", "value_at_risk.py", "Value at Risk"),
-        "5": ("strategy_backtests", "lmp_strategy.py", "LMP Strategy Backtest"),
-        "6": ("strategy_backtests", "ma_strategy.py", "MA Strategy Backtest"),
-        "7": ("strategy_backtests", "bollinger_bands_strategy.py", "Bollinger Bands Backtest"),
-        "8": ("market_data", "bcb_historical_data.py", "BCB Historical Data"),
-        "9": ("market_data", "bcb_market_expectations.py", "BCB Market Expectations"),
+        "5": ("market_data", "bcb_historical_data.py", "BCB Historical Data"),
+        "6": ("market_data", "bcb_market_expectations.py", "BCB Market Expectations"),
+        "7": ("strategies", "relative_momentum.py", "Relative Momentum Allocation Backtest"),
+        "8": ("strategies", "moving_average.py", "Moving Average Allocation Backtest"),
+        "9": ("strategies", "bollinger.py", "Bollinger Bands Backtest"),
     }
 
     while True:
@@ -96,7 +97,7 @@ def main():
             run_script(script_path)
             input("Press Enter to return to menu...")
         else:
-            print("Invalid option. Please select a number between 0 and 8.")
+            print("Invalid option. Please select a number between 0 and 9.")
             input("Press Enter to continue...")
 
 
