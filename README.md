@@ -1,4 +1,4 @@
-# 📈 Financial Market Python
+# 📈 QuantKit
 
 A Python toolkit for quantitative strategy research, portfolio analysis, risk measurement, and market data.
 
@@ -7,8 +7,8 @@ A Python toolkit for quantitative strategy research, portfolio analysis, risk me
 The project requires Python 3.12 or 3.13 and [uv](https://docs.astral.sh/uv/).
 
 ```bash
-git clone https://github.com/gabrielpalassi/FinancialMarketPython.git
-cd FinancialMarketPython
+git clone https://github.com/gabrielpalassi/QuantKit.git
+cd QuantKit
 uv sync
 ```
 

@@ -1,9 +1,6 @@
-"""
-Utility functions for the Financial Market Python project.
-
-This module contains common functionality used across multiple scripts,
-including input validation, data retrieval, and plotting utilities.
-"""
+#
+# Imports
+#
 
 import logging
 from datetime import datetime, date
@@ -11,6 +8,10 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 import mplcursors
 import os
+
+#
+# Functions
+#
 
 
 def configure_yfinance_logging():

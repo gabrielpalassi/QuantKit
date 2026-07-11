@@ -1,7 +1,7 @@
 [project]
-name = "FinancialMarketPython"
-version = "1.0.1"
-description = "A collection of financial analysis tools for portfolio management, risk assessment, and market data analysis"
+name = "QuantKit"
+version = "1.2.0"
+description = "A Python toolkit for quantitative strategy research, portfolio analysis, risk measurement, and market data."
 authors = [
     { name = "Gabriel Palassi" }
 ]
@@ -22,8 +22,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/gabrielpalassi/FinancialMarketPython"
-Repository = "https://github.com/gabrielpalassi/FinancialMarketPython"
+Homepage = "https://github.com/gabrielpalassi/QuantKit"
+Repository = "https://github.com/gabrielpalassi/QuantKit"
 
 [tool.black]
 line-length = 160
